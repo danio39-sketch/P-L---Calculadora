@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bundle Pack P&L — Calculadora</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:          #f5f4f1;
+      --bg-card:     #ffffff;
+      --bg-row:      #fafaf9;
+      --text:        #111110;
+      --text-sec:    #6b6b68;
+      --text-ter:    #a3a39f;
+      --border:      #d8d7d3;
+      --border-lt:   #eceae6;
+      --border-ltr:  #f4f3f0;
+      --green:       #15803d;
+      --green-bg:    #dcfce7;
+      --green-bd:    #22c55e;
+      --red:         #b91c1c;
+      --red-bg:      #fee2e2;
+      --red-bd:      #ef4444;
+      --amber:       #92400e;
+      --amber-bg:    #fef3c7;
+      --amber-bd:    #f59e0b;
+      --blue:        #1e40af;
+      --blue-bg:     #dbeafe;
+      --blue-bd:     #3b82f6;
+      --ink:         #111110;
+      --radius:      5px;
+      --font-body:   'IBM Plex Sans', sans-serif;
+      --font-mono:   'IBM Plex Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ─────────────────────────────────── */
+    .header {
+      background: var(--ink);
+      color: #f5f4f1;
+      padding: 0 24px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #2a2a28;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #f5f4f1;
+      border: 1px solid #3a3a38;
+      padding: 4px 8px;
+      border-radius: 3px;
+    }
+    .header h1 {
+      font-size: 13px;
+      font-weight: 500;
+      color: #a3a39f;
+      letter-spacing: .01em;
+    }
+    .header-right {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #6b6b68;
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    /* ── LAYOUT ──────────────────────────────────── */
+    .container { max-width: 800px; margin: 0 auto; padding: 24px 16px 64px; }
+
+    /* ── SECTION LABEL ───────────────────────────── */
+    .slbl {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-ter);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin: 0 0 12px;
+    }
+
+    /* ── CARD ────────────────────────────────────── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 12px;
+    }
+
+    /* ── GRID ────────────────────────────────────── */
+    .fg { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 520px) { .fg { grid-template-columns: 1fr; } }
+
+    /* ── FIELD ───────────────────────────────────── */
+    .f { display: flex; flex-direction: column; gap: 5px; }
+    .lbl {
+      font-size: 11.5px;
+      color: var(--text-sec);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      line-height: 1.5;
+    }
+    .nt { font-size: 10.5px; color: var(--text-ter); }
+
+    /* ── INPUT GROUP ─────────────────────────────── */
+    .ig {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg-card);
+      transition: border-color .12s;
+    }
+    .ig:focus-within { border-color: var(--ink); }
+    .ig .sym {
+      padding: 0 2px 0 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      flex-shrink: 0;
+      color: var(--text-sec);
+    }
+    .ig input {
+      border: none;
+      outline: none;
+      box-shadow: none;
+      background: transparent;
+      flex: 1;
+      min-width: 0;
+      padding: 8px 10px 8px 4px;
+      font-size: 14px;
+      font-family: var(--font-mono);
+      color: var(--text);
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { opacity: 0.3; }
+
+    /* ── PILL TOGGLE ─────────────────────────────── */
+    .pill {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .pill button {
+      padding: 1px 8px;
+      font-size: 10.5px;
+      font-family: var(--font-body);
+      border: none;
+      cursor: pointer;
+      line-height: 1.8;
+      color: var(--text-sec);
+      background: transparent;
+      transition: background .1s, color .1s;
+    }
+
+    /* ── TOOLTIP ─────────────────────────────────── */
+    .tw { position: relative; display: inline-block; }
+    .tic {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--text-ter);
+      cursor: help;
+      font-style: italic;
+      font-family: Georgia, serif;
+    }
+    .tw:hover .tb { display: block; }
+    .tb {
+      display: none;
+      position: absolute;
+      bottom: 22px; left: -80px;
+      width: 220px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 9px 11px;
+      font-size: 11px;
+      color: var(--text-sec);
+      line-height: 1.55;
+      z-index: 99;
+      box-shadow: 0 6px 20px rgba(0,0,0,.1);
+    }
+
+    /* ── DIVIDER ─────────────────────────────────── */
+    .div { border: none; border-top: 1px solid var(--border-lt); margin: 1.25rem 0; }
+
+    /* ── KPI ROW ─────────────────────────────────── */
+    .kr { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
+    .kc {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+    }
+    .kl { font-size: 11px; color: var(--text-sec); margin-bottom: 5px; }
+    .kv {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* ── STATUS BAR ──────────────────────────────── */
+    .sb {
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: 12.5px;
+      margin-bottom: 12px;
+      line-height: 1.55;
+      border: 1px solid transparent;
+    }
+    .s-ok  { background: var(--green-bg);  color: var(--green);  border-color: var(--green-bd);  }
+    .s-warn{ background: var(--amber-bg);  color: var(--amber);  border-color: var(--amber-bd);  }
+    .s-bad { background: var(--red-bg);    color: var(--red);    border-color: var(--red-bd);    }
+
+    /* ── P&L TABLE ───────────────────────────────── */
+    .pt-wrap {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--bg-card);
+    }
+    .pt { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .pt th {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-ter);
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+      background: var(--bg-row);
+    }
+    .pt th:first-child { text-align: left; }
+    .pt td {
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--border-ltr);
+      color: var(--text);
+      font-family: var(--font-body);
+    }
+    .pt td:not(:first-child) {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+    .pt tr:last-child td { border-bottom: none; }
+    .pt tr.sub td:first-child {
+      padding-left: 22px;
+      font-size: 12px;
+      color: var(--text-sec);
+    }
+    .pt tr.ded td  { color: var(--red); }
+    .pt tr.tot td  { background: var(--bg-row); font-weight: 600; }
+    .pt tr.mac-ok  td { background: var(--green-bg); color: var(--green);  font-weight: 600; }
+    .pt tr.mac-bad td { background: var(--red-bg);   color: var(--red);    font-weight: 600; }
+    .pt tr.rem-ok  td { background: var(--green-bg); color: var(--green);  font-weight: 600; }
+    .pt tr.rem-warn td{ background: var(--amber-bg); color: var(--amber);  font-weight: 600; }
+    .pt tr.ref td  { color: var(--text-sec); font-size: 11.5px; }
+    .pt tr.bu  td  { background: var(--blue-bg);  color: var(--blue);   font-weight: 600; }
+    .pt tr.sr  td  {
+      padding: 5px 10px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-ter);
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      border-top: 1px solid var(--border);
+      background: var(--bg-row);
+    }
+
+    /* ── FOOTNOTE ────────────────────────────────── */
+    .footnote {
+      font-size: 11px;
+      color: var(--text-ter);
+      margin-top: 10px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <span class="logo">Mars Wrigley MX</span>
+    <h1>Bundle Pack — Calculadora P&L</h1>
+  </div>
+  <div class="header-right">
+    Ingeniería inversa de precio<br>RSP → MAC objetivo
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- PRECIO & ESTRUCTURA -->
+  <div class="card">
+    <p class="slbl">Precio & estructura comercial</p>
+    <div class="fg">
+      <div class="f">
+        <span class="lbl">RSP precio consumidor $MXN</span>
+        <div class="ig">
+          <span class="sym">$</span>
+          <input type="number" id="rsp" value="250" min="1" oninput="recalc()">
+        </div>
+      </div>
+      <div class="f">
+        <span class="lbl">Markup del cliente % sobre GSV
+          <span class="tw"><span class="tic">?</span>
+          <div class="tb">RSP = GSV × (1 + markup%). Distinto del margen sobre RSP. Si GSV=$170 y markup=32%, RSP=$224.40.</div></span>
+        </span>
+        <div class="ig">
+          <span class="sym">%</span>
+          <input type="number" id="ret" value="30" min="0" max="200" step="0.5" oninput="recalc()">
+        </div>
+        <span class="nt">RSP = GSV × (1 + %). Ref: Walmart ~32%</span>
+      </div>
+      <div class="f">
+        <span class="lbl">Bracket del cliente % GSV
+          <span class="tw"><span class="tic">?</span>
+          <div class="tb">Descuento financiero estructural negociado por cuenta, aplicado sobre GSV. Va antes del trade spend. Ej: Walmart 11.5%, Sam's 10%.</div></span>
+        </span>
+        <div class="ig" style="border-left:2.5px solid #f59e0b">
+          <span class="sym" style="color:#92400e">%</span>
+          <input type="number" id="bracket" value="11.5" min="0" max="50" step="0.5" oninput="recalc()">
+        </div>
+        <span class="nt">Descuento fijo por cuenta. Ref: Walmart 11.5%</span>
+      </div>
+      <div class="f">
+        <span class="lbl">Trade spend % GSV</span>
+        <div class="ig">
+          <span class="sym">%</span>
+          <input type="number" id="trade" value="7" min="0" max="50" step="0.5" oninput="recalc()">
+        </div>
+        <span class="nt">Inversión variable en cuenta. Ref: Turin 7.0%</span>
+      </div>
+      <div class="f">
+        <span class="lbl">MAC objetivo mínimo % NSV</span>
+        <div class="ig">
+          <span class="sym">%</span>
+          <input type="number" id="mact" value="22.3" min="0" max="80" step="0.1" oninput="recalc()">
+        </div>
+        <span class="nt">Ref. Turin Mini Bottle: 22.3%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- COGS -->
+  <div class="card">
+    <p class="slbl">COGS del producto base — selecciona $ o %NSV por línea</p>
+    <div id="cgrid" class="fg"></div>
+  </div>
+
+  <!-- GADGET & EMPAQUE -->
+  <div class="card">
+    <p class="slbl">Bundle: gadget & empaque adicional</p>
+    <div class="fg">
+      <div class="f">
+        <span class="lbl">Costo gadget $MXN</span>
+        <div class="ig" style="border-left:2.5px solid #22c55e">
+          <span class="sym" style="color:#15803d">$</span>
+          <input type="number" id="gadget" value="25" min="0" step="0.5" oninput="recalc()">
+        </div>
+        <span class="nt">Taza, termo, bolsa, set, etc.</span>
+      </div>
+      <div class="f">
+        <span class="lbl">Empaque adicional $MXN</span>
+        <div class="ig" style="border-left:2.5px solid #22c55e">
+          <span class="sym" style="color:#15803d">$</span>
+          <input type="number" id="pack" value="0" min="0" step="0.5" oninput="recalc()">
+        </div>
+        <span class="nt">Caja, sleeve, display exterior</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kr">
+    <div class="kc"><div class="kl">NSV / unidad</div><div class="kv" id="k_nsv">—</div></div>
+    <div class="kc"><div class="kl">MAC real % NSV</div><div class="kv" id="k_mac">—</div></div>
+    <div class="kc"><div class="kl">Gadget máx. posible</div><div class="kv" id="k_gmax">—</div></div>
+    <div class="kc"><div class="kl">RSP mínimo requerido</div><div class="kv" id="k_rspmin">—</div></div>
+  </div>
+
+  <!-- STATUS -->
+  <div id="sb" class="sb s-ok"> </div>
+
+  <!-- P&L TABLE -->
+  <div class="pt-wrap">
+    <table class="pt">
+      <thead>
+        <tr>
+          <th style="text-align:left">Concepto</th>
+          <th>$ MXN</th>
+          <th>%</th>
+        </tr>
+      </thead>
+      <tbody id="plb"></tbody>
+    </table>
+  </div>
+
+  <p class="footnote">% = %GSV para markup, bracket y trade &nbsp;·&nbsp; %NSV para COGS y MAC</p>
+
+</div>
+
+<script>
+const COGS = [
+  { id:'raws', lbl:'Raws & Packs',      val:35, mode:'$', note:'Mat. prima + empaque del producto base', tip:null },
+  { id:'mcc',  lbl:'MCC / Manufactura', val:15, mode:'$', note:'Conversión en planta (MCC + MCC INV)',   tip:null },
+  { id:'lcc',  lbl:'LCC / Logística',   val:5,  mode:'%', note:'Si no lo tienes, 4–6% NSV ref. CPG México',
+    tip:'Logistics & Customer Costs: flete planta → DC del retailer, almacenaje y maniobras. Mars lo mide por tonelada. Usa %NSV si no tienes el dato exacto.' },
+  { id:'oh',   lbl:'Overhead / fijos',  val:3,  mode:'%', note:'Si no lo tienes, 2–4% NSV como benchmark',
+    tip:'Costos fijos asignados al SKU: depreciación, SG&A prorrateado por línea de negocio. Finanzas lo da como % estándar.' }
+];
+
+/* Inline style strings — bypasan CSS de la UI */
+const SB_ABS = 'background:#dcfce7;color:#15803d;font-weight:600';
+const SB_PCT = 'background:#dbeafe;color:#1e40af;font-weight:600';
+const SB_OFF = 'background:transparent;color:#6b6b68;font-weight:400';
+const IB_ABS = '2.5px solid #22c55e';
+const IB_PCT = '2.5px solid #3b82f6';
+const C_ABS  = '#15803d';
+const C_PCT  = '#1e40af';
+
+function applyMode(id, mode) {
+  document.getElementById(id+'-ig').style.borderLeft = mode==='$' ? IB_ABS : IB_PCT;
+  const sym = document.getElementById(id+'-sym');
+  sym.style.color   = mode==='$' ? C_ABS : C_PCT;
+  sym.textContent   = mode==='$' ? '$' : '%';
+  document.getElementById(id+'-a').style.cssText = mode==='$' ? SB_ABS : SB_OFF;
+  document.getElementById(id+'-p').style.cssText = mode==='%' ? SB_PCT : SB_OFF;
+}
+
+function buildCogs() {
+  const grid = document.getElementById('cgrid');
+  COGS.forEach(cg => {
+    const div = document.createElement('div'); div.className = 'f';
+
+    /* label + pill */
+    const lbl = document.createElement('span'); lbl.className = 'lbl';
+    lbl.appendChild(document.createTextNode(cg.lbl + ' '));
+    const pill = document.createElement('span'); pill.className = 'pill';
+    const bA = document.createElement('button');
+    bA.textContent = '$'; bA.id = cg.id+'-a';
+    bA.style.cssText = cg.mode==='$' ? SB_ABS : SB_OFF;
+    bA.onclick = () => setMode(cg.id, '$');
+    const bP = document.createElement('button');
+    bP.textContent = '%NSV'; bP.id = cg.id+'-p';
+    bP.style.cssText = cg.mode==='%' ? SB_PCT : SB_OFF;
+    bP.onclick = () => setMode(cg.id, '%');
+    pill.appendChild(bA); pill.appendChild(bP);
+    lbl.appendChild(pill);
+    if (cg.tip) {
+      const tw = document.createElement('span'); tw.className = 'tw';
+      tw.innerHTML = '<span class="tic">?</span><div class="tb">'+cg.tip+'</div>';
+      lbl.appendChild(tw);
+    }
+    div.appendChild(lbl);
+
+    /* input group */
+    const ig = document.createElement('div'); ig.className = 'ig'; ig.id = cg.id+'-ig';
+    ig.style.borderLeft = cg.mode==='$' ? IB_ABS : IB_PCT;
+    const sym = document.createElement('span'); sym.className = 'sym'; sym.id = cg.id+'-sym';
+    sym.textContent = cg.mode==='$' ? '$' : '%';
+    sym.style.color = cg.mode==='$' ? C_ABS : C_PCT;
+    const inp = document.createElement('input');
+    inp.type = 'number'; inp.id = cg.id; inp.value = cg.val; inp.min = 0; inp.step = 0.5;
+    inp.style.cssText = 'border:none;outline:none;box-shadow:none;background:transparent;flex:1;min-width:0;padding:8px 10px 8px 4px;font-size:14px;font-family:var(--font-mono)';
+    inp.oninput = recalc;
+    ig.appendChild(sym); ig.appendChild(inp);
+    div.appendChild(ig);
+
+    const note = document.createElement('span'); note.className = 'nt'; note.textContent = cg.note;
+    div.appendChild(note);
+    grid.appendChild(div);
+  });
+}
+
+function setMode(id, mode) {
+  COGS.find(c => c.id===id).mode = mode;
+  applyMode(id, mode);
+  recalc();
+}
+
+const g  = id => parseFloat(document.getElementById(id).value) || 0;
+const f$ = n  => (n < 0 ? '-' : '') + '$' + Math.abs(n).toFixed(1);
+const fp = n  => n.toFixed(1) + '%';
+
+function mkRow(lbl, abs, pctV, cls, sub) {
+  const row = document.createElement('tr');
+  row.className = cls + (sub ? ' sub' : '');
+  const isDed = cls === 'ded';
+  const t1 = document.createElement('td'); t1.textContent = lbl;
+  const t2 = document.createElement('td');
+  t2.textContent = isDed ? ('-$' + Math.abs(abs).toFixed(1)) : f$(abs);
+  const t3 = document.createElement('td');
+  t3.textContent = pctV === null ? '—' : (isDed ? ('-' + fp(Math.abs(pctV))) : fp(pctV));
+  row.appendChild(t1); row.appendChild(t2); row.appendChild(t3);
+  return row;
+}
+
+function recalc() {
+  const rsp = g('rsp'), retP = g('ret'), bracketP = g('bracket'),
+        tradeP = g('trade'), mactP = g('mact');
+  const gadget = g('gadget'), pack = g('pack');
+
+  /* Cascada */
+  const mkup     = retP / 100;
+  const gsv      = rsp / (1 + mkup);
+  const retA     = rsp - gsv;
+  const bracketA = gsv * bracketP / 100;
+  const tradeA   = gsv * tradeP   / 100;
+  const nsv      = gsv - bracketA - tradeA;
+  const pct      = a => nsv > 0 ? a / nsv * 100 : 0;
+
+  const cogsVals = {};
+  COGS.forEach(cg => {
+    const v = g(cg.id);
+    cogsVals[cg.id] = cg.mode === '$' ? v : nsv * v / 100;
+  });
+  const cogsTotal = Object.values(cogsVals).reduce((a,b) => a+b, 0);
+
+  const mac       = nsv - cogsTotal - gadget - pack;
+  const macPct    = pct(mac);
+  const macOK     = macPct >= mactP;
+  const mactA     = nsv * mactP / 100;
+  const budget    = nsv - cogsTotal - mactA;
+  const remaining = budget - gadget - pack;
+  const gadgetMax = Math.max(0, budget - pack);
+
+  /* Bottom-up */
+  let FC = gadget + pack, PCfrac = 0;
+  COGS.forEach(cg => { if (cg.mode==='$') FC += g(cg.id); else PCfrac += g(cg.id)/100; });
+  const denom    = 1 - PCfrac - mactP/100;
+  const gsvDenom = 1 - bracketP/100 - tradeP/100;
+  let rspMin = null;
+  if (denom > 0.001 && gsvDenom > 0.001) {
+    const nsvMin = FC / denom;
+    const gsvMin = nsvMin / gsvDenom;
+    rspMin = gsvMin * (1 + mkup);
+  }
+
+  /* KPIs */
+  document.getElementById('k_nsv').textContent = f$(nsv);
+  const kMac = document.getElementById('k_mac');
+  kMac.textContent = fp(macPct);
+  kMac.style.color = macOK ? '#15803d' : '#b91c1c';
+  document.getElementById('k_gmax').textContent = f$(gadgetMax);
+  const kRmin = document.getElementById('k_rspmin');
+  if (rspMin !== null) {
+    kRmin.textContent = f$(rspMin);
+    kRmin.style.color = rsp >= rspMin ? '#15803d' : '#b91c1c';
+  } else {
+    kRmin.textContent = 'N/A';
+    kRmin.style.color = '#9ca3af';
+  }
+
+  /* Status bar */
+  const sb = document.getElementById('sb');
+  const ri = rspMin ? 'RSP mínimo: ' + f$(rspMin) + '.' : '';
+  if (macOK && remaining >= 0) {
+    sb.className = 'sb s-ok';
+    sb.textContent = 'Bundle viable — MAC ' + fp(macPct) + ' sobre objetivo ' + fp(mactP) +
+      '. Margen restante: ' + f$(remaining) + ' (' + fp(pct(remaining)) + '). ' + ri;
+  } else if (macOK && remaining < 0) {
+    sb.className = 'sb s-warn';
+    sb.textContent = 'MAC OK (' + fp(macPct) + ') pero gadget+empaque supera presupuesto en ' +
+      f$(Math.abs(remaining)) + '. Gadget máx posible: ' + f$(gadgetMax) + '.';
+  } else {
+    sb.className = 'sb s-bad';
+    sb.textContent = 'Bundle NO viable — MAC cae ' + fp(mactP - macPct) +
+      ' bajo objetivo. ' + ri + ' Reduce costos o ajusta RSP.';
+  }
+
+  /* P&L table */
+  const b = document.getElementById('plb');
+  b.innerHTML = '';
+
+  b.appendChild(mkRow('RSP (precio a consumidor)',                         rsp,      null,      '',          false));
+  b.appendChild(mkRow('(-) Markup cliente ('+retP+'% sobre GSV)',          retA,     retP,      'ded',       true));
+  b.appendChild(mkRow('= GSV',                                             gsv,      null,      'tot',       false));
+  b.appendChild(mkRow('(-) Bracket cliente ('+bracketP+'% sobre GSV)',     bracketA, bracketP,  'ded',       true));
+  b.appendChild(mkRow('(-) Trade spend ('   +tradeP  +'% sobre GSV)',      tradeA,   tradeP,    'ded',       true));
+  b.appendChild(mkRow('= NSV [base 100%]',                                 nsv,      100,       'tot',       false));
+
+  COGS.forEach(cg => {
+    const a   = cogsVals[cg.id];
+    const sfx = cg.mode === '%' ? ' (' + g(cg.id) + '% NSV)' : '';
+    b.appendChild(mkRow('(-) ' + cg.lbl + sfx,                            a,        pct(a),    'ded',       true));
+  });
+
+  b.appendChild(mkRow('(-) Gadget',                                        gadget,   pct(gadget),'ded',      true));
+  b.appendChild(mkRow('(-) Empaque adicional',                             pack,     pct(pack), 'ded',       true));
+  b.appendChild(mkRow('= MAC real',                                        mac,      macPct,    macOK ? 'mac-ok' : 'mac-bad', false));
+  b.appendChild(mkRow('MAC objetivo mínimo',                               mactA,    mactP,     'ref',       false));
+  b.appendChild(mkRow('Presupuesto total (gadget + empaque)',               Math.max(0,budget), pct(Math.max(0,budget)), 'tot', false));
+  b.appendChild(mkRow('Margen de maniobra restante',                       remaining,pct(remaining), remaining>=0?'rem-ok':'rem-warn', false));
+
+  if (rspMin !== null) {
+    const sr = document.createElement('tr'); sr.className = 'sr';
+    const sc = document.createElement('td'); sc.colSpan = 3;
+    sc.textContent = 'Bottom-up — ingeniería inversa desde costos';
+    sr.appendChild(sc); b.appendChild(sr);
+    b.appendChild(mkRow('RSP mínimo requerido',                            rspMin,   null,      'bu',        false));
+    const delta = rsp - rspMin;
+    b.appendChild(mkRow('Delta RSP actual vs mínimo',                      delta,    null,      delta>=0 ? 'rem-ok' : 'rem-warn', false));
+  }
+}
+
+buildCogs();
+recalc();
+</script>
+</body>
+</html>
