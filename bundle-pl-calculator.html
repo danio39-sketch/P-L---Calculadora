@@ -4,11 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bundle Pack P&L — Calculadora | Mars Wrigley MX</title>
-  <meta name="description" content="Calculadora de P&L inverso para bundle packs estacionales. RSP → GSV → NSV → MAC.">
+  <meta name="description" content="Calculadora de P&L inverso para bundle packs estacionales. RSP → GSV → NSV → MAC. Vista por unidad y por corrugado.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    /* ── TOKENS ───────────────────────────────── */
     :root {
       --bg:        #f5f4f1;
       --bg-card:   #ffffff;
@@ -25,234 +24,98 @@
       --amber:     #92400e;  --amber-bg:  #fef3c7;  --amber-bd:  #f59e0b;
       --amber-row: #fefce8;
       --purple:    #6b21a8;  --purple-bg: #f3e8ff;  --purple-bd: #a855f7;
+      --cyan:      #0e7490;  --cyan-bg:   #cffafe;  --cyan-bd:   #22d3ee;
       --blue:      #1e40af;  --blue-bg:   #dbeafe;  --blue-bd:   #3b82f6;
-      --font:      'IBM Plex Sans',  sans-serif;
+      --font:      'IBM Plex Sans', sans-serif;
       --mono:      'IBM Plex Mono', monospace;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    /* ── HEADER ──────────────────────────────── */
+    /* ── HEADER ── */
     .header {
-      background: #111110;
-      color: #f5f4f1;
-      height: 52px;
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 20;
+      background: #111110; color: #f5f4f1;
+      height: 52px; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 20;
     }
     .header-left { display: flex; align-items: center; gap: 12px; }
-    .logo {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      border: 1px solid #3a3a38;
-      padding: 3px 8px;
-      border-radius: 3px;
-      color: #f5f4f1;
-    }
+    .logo { font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; border: 1px solid #3a3a38; padding: 3px 8px; border-radius: 3px; }
     .header h1 { font-size: 13px; font-weight: 400; color: #9ca3af; }
     .header-right { font-family: var(--mono); font-size: 10px; color: #4b5563; text-align: right; line-height: 1.6; }
 
-    /* ── LAYOUT ──────────────────────────────── */
+    /* ── LAYOUT ── */
     .container { max-width: 800px; margin: 0 auto; padding: 24px 16px 64px; }
 
-    /* ── CARD ────────────────────────────────── */
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-      margin-bottom: 10px;
-    }
+    /* ── CARD ── */
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 10px; }
 
-    /* ── SECTION LABEL ───────────────────────── */
-    .slbl {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text-ter);
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
+    /* ── SECTION LABEL ── */
+    .slbl { font-size: 10px; font-weight: 600; color: var(--text-ter); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px; }
 
-    /* ── GRID ────────────────────────────────── */
+    /* ── GRID ── */
     .fg { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 520px) { .fg { grid-template-columns: 1fr; } }
 
-    /* ── FIELD ───────────────────────────────── */
+    /* ── FIELD ── */
     .f { display: flex; flex-direction: column; gap: 5px; }
-    .lbl {
-      font-size: 11.5px;
-      color: var(--text-sec);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      flex-wrap: wrap;
-      line-height: 1.5;
-    }
+    .lbl { font-size: 11.5px; color: var(--text-sec); display: flex; align-items: center; gap: 5px; flex-wrap: wrap; line-height: 1.5; }
     .nt { font-size: 10.5px; color: var(--text-ter); }
+    .nt-calc { font-size: 10.5px; font-weight: 600; color: var(--cyan); font-family: var(--mono); }
 
-    /* ── INPUT GROUP ─────────────────────────── */
-    .ig {
-      display: flex;
-      align-items: center;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--bg-card);
-      transition: border-color .12s;
-    }
+    /* ── INPUT GROUP ── */
+    .ig { display: flex; align-items: center; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-card); transition: border-color .12s; }
     .ig:focus-within { border-color: var(--border-dk); }
-    .ig .sym {
-      padding: 0 2px 0 10px;
-      font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 500;
-      flex-shrink: 0;
-      color: var(--text-ter);
-    }
-    .ig input {
-      border: none;
-      outline: none;
-      box-shadow: none;
-      background: transparent;
-      flex: 1;
-      min-width: 0;
-      padding: 8px 10px 8px 4px;
-      font-size: 14px;
-      font-family: var(--mono);
-      color: var(--text);
-    }
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button { opacity: .3; }
+    .ig .sym { padding: 0 2px 0 10px; font-family: var(--mono); font-size: 12px; font-weight: 500; flex-shrink: 0; color: var(--text-ter); }
+    .ig input { border: none; outline: none; box-shadow: none; background: transparent; flex: 1; min-width: 0; padding: 8px 10px 8px 4px; font-size: 14px; font-family: var(--mono); color: var(--text); }
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { opacity: .3; }
 
-    /* ── PILL TOGGLE ─────────────────────────── */
-    .pill {
-      display: inline-flex;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-    }
-    .pill button {
-      padding: 1px 8px;
-      font-size: 10.5px;
-      font-family: var(--font);
-      border: none;
-      cursor: pointer;
-      line-height: 1.8;
-      color: var(--text-sec);
-      background: transparent;
-      transition: background .1s, color .1s;
-    }
+    /* ── PILL ── */
+    .pill { display: inline-flex; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+    .pill button { padding: 1px 8px; font-size: 10.5px; font-family: var(--font); border: none; cursor: pointer; line-height: 1.8; color: var(--text-sec); background: transparent; }
 
-    /* ── BADGE TAGS ──────────────────────────── */
-    .tag {
-      font-size: 9.5px;
-      font-weight: 600;
-      letter-spacing: .05em;
-      text-transform: uppercase;
-      border-radius: 3px;
-      padding: 1px 5px;
-      margin-left: 3px;
-    }
+    /* ── TAGS ── */
+    .tag { font-size: 9.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; border-radius: 3px; padding: 1px 5px; margin-left: 3px; }
     .tag-fiscal  { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-bd);  }
     .tag-mkt     { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-bd); }
+    .tag-sec     { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-bd);  }
+    .tag-ter     { background: var(--cyan-bg);   color: var(--cyan);   border: 1px solid var(--cyan-bd);   }
 
-    /* ── TOOLTIP ─────────────────────────────── */
+    /* ── TOOLTIP ── */
     .tw { position: relative; display: inline-block; }
-    .tic {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      border: 1px solid var(--border-md);
-      font-size: 10px;
-      color: var(--text-ter);
-      cursor: help;
-      font-style: italic;
-      font-family: Georgia, serif;
-    }
+    .tic { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--border-md); font-size: 10px; color: var(--text-ter); cursor: help; font-style: italic; font-family: Georgia, serif; }
     .tw:hover .tb { display: block; }
-    .tb {
-      display: none;
-      position: absolute;
-      bottom: 22px; left: -80px;
-      width: 220px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 9px 11px;
-      font-size: 11px;
-      color: var(--text-sec);
-      line-height: 1.55;
-      z-index: 99;
-      box-shadow: 0 6px 20px rgba(0,0,0,.1);
-      font-style: normal;
-    }
+    .tb { display: none; position: absolute; bottom: 22px; left: -80px; width: 220px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 11px; font-size: 11px; color: var(--text-sec); line-height: 1.55; z-index: 99; box-shadow: 0 6px 20px rgba(0,0,0,.1); font-style: normal; }
 
-    /* ── KPI ROW ─────────────────────────────── */
+    /* ── DIVIDER ── */
+    .div { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+
+    /* ── KPI ROW ── */
     .kr { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
-    .kc {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px 14px;
-    }
+    .kc { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
     .kl { font-size: 11px; color: var(--text-ter); margin-bottom: 5px; }
     .kv { font-family: var(--mono); font-size: 20px; font-weight: 600; color: var(--text); }
 
-    /* ── STATUS BAR ──────────────────────────── */
-    .sb {
-      border-radius: var(--radius);
-      padding: 10px 14px;
-      font-size: 12.5px;
-      margin-bottom: 10px;
-      line-height: 1.55;
-      border: 1px solid transparent;
-    }
+    /* ── STATUS ── */
+    .sb { border-radius: var(--radius); padding: 10px 14px; font-size: 12.5px; margin-bottom: 10px; line-height: 1.55; border: 1px solid transparent; }
     .s-ok   { background: var(--green-bg);  color: var(--green);  border-color: var(--green-bd);  }
     .s-warn { background: var(--amber-bg);  color: var(--amber);  border-color: var(--amber-bd);  }
     .s-bad  { background: var(--red-bg);    color: var(--red);    border-color: var(--red-bd);    }
 
-    /* ── P&L TABLE ───────────────────────────── */
-    .pt-wrap {
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
+    /* ── TABS ── */
+    .tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+    .tab-btn { padding: 6px 16px; font-size: 12px; font-family: var(--mono); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; background: var(--bg-card); color: var(--text-sec); transition: all .12s; }
+    .tab-btn.active { background: #111110; color: #f5f4f1; border-color: #111110; }
+
+    /* ── P&L TABLE ── */
+    .pt-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
     .pt { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-    .pt th {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text-ter);
-      letter-spacing: .07em;
-      text-transform: uppercase;
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--border);
-      text-align: right;
-      background: var(--bg-row);
-    }
+    .pt th { font-size: 10px; font-weight: 600; color: var(--text-ter); letter-spacing: .07em; text-transform: uppercase; padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: right; background: var(--bg-row); }
     .pt th:first-child { text-align: left; }
     .pt td { padding: 7px 10px; border-bottom: 1px solid #f3f4f6; color: var(--text); }
-    .pt td:not(:first-child) {
-      text-align: right;
-      font-family: var(--mono);
-      font-size: 12px;
-      font-variant-numeric: tabular-nums;
-    }
+    .pt td:not(:first-child) { text-align: right; font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
     .pt tr:last-child td { border-bottom: none; }
     .pt tr.sub td:first-child { padding-left: 22px; font-size: 12px; color: var(--text-sec); }
     .pt tr.ded     td { color: var(--red); }
@@ -264,18 +127,9 @@
     .pt tr.rem-warn td{ background: var(--amber-bg);  color: var(--amber);  font-weight: 600; }
     .pt tr.ref     td { color: var(--text-ter); font-size: 11.5px; }
     .pt tr.bu      td { background: var(--blue-bg);   color: var(--blue);   font-weight: 600; }
-    .pt tr.sr      td {
-      padding: 5px 10px;
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text-ter);
-      letter-spacing: .07em;
-      text-transform: uppercase;
-      border-top: 1px solid var(--border);
-      background: var(--bg-row);
-    }
+    .pt tr.sr      td { padding: 5px 10px; font-size: 10px; font-weight: 600; color: var(--text-ter); letter-spacing: .07em; text-transform: uppercase; border-top: 1px solid var(--border); background: var(--bg-row); }
 
-    /* ── FOOTNOTE ────────────────────────────── */
+    /* ── FOOTNOTE ── */
     .fn { font-size: 10.5px; color: var(--text-ter); margin-top: 8px; text-align: right; }
   </style>
 </head>
@@ -298,76 +152,52 @@
   <div class="card">
     <p class="slbl">Precio & estructura comercial</p>
     <div class="fg">
-
       <div class="f">
         <span class="lbl">RSP precio consumidor $MXN</span>
-        <div class="ig">
-          <span class="sym">$</span>
-          <input type="number" id="rsp" value="250" min="1" oninput="recalc()">
-        </div>
+        <div class="ig"><span class="sym">$</span>
+          <input type="number" id="rsp" value="250" min="1" oninput="recalc()"></div>
       </div>
-
       <div class="f">
         <span class="lbl">Markup del cliente % sobre GSV
           <span class="tw"><span class="tic">?</span>
-          <div class="tb">RSP = GSV facturado × (1 + markup%). El retailer aplica su markup sobre el total que paga (GSV + IEPS incluido).</div></span>
+          <div class="tb">RSP = GSV facturado × (1 + markup%). El retailer aplica su markup sobre el total que paga (GSV + IEPS).</div></span>
         </span>
-        <div class="ig">
-          <span class="sym">%</span>
-          <input type="number" id="ret" value="30" min="0" max="200" step="0.5" oninput="recalc()">
-        </div>
+        <div class="ig"><span class="sym">%</span>
+          <input type="number" id="ret" value="30" min="0" max="200" step="0.5" oninput="recalc()"></div>
         <span class="nt">RSP = GSV × (1 + %). Ref: Walmart ~32%</span>
       </div>
-
       <div class="f">
-        <span class="lbl">
-          IEPS % sobre GSV
-          <span class="tag tag-fiscal">Fiscal</span>
+        <span class="lbl">IEPS % sobre GSV <span class="tag tag-fiscal">Fiscal</span>
           <span class="tw"><span class="tic">?</span>
-          <div class="tb">Mars cobra el IEPS al cliente y lo remite a SAT. No es ingreso de la empresa. Aplica a chocolates y dulces ≥275 kcal/100g. Tasa vigente: 8%.</div></span>
+          <div class="tb">Mars cobra el IEPS al cliente y lo remite a SAT. No es ingreso de la empresa. Aplica a chocolates ≥275 kcal/100g. Tasa vigente: 8%.</div></span>
         </span>
         <div class="ig" style="border-left:2.5px solid #f59e0b">
           <span class="sym" style="color:#92400e">%</span>
-          <input type="number" id="ieps" value="8" min="0" max="30" step="0.5" oninput="recalc()">
-        </div>
+          <input type="number" id="ieps" value="8" min="0" max="30" step="0.5" oninput="recalc()"></div>
         <span class="nt">Chocolates y dulces: 8% (Reforma Fiscal 2014)</span>
       </div>
-
       <div class="f">
-        <span class="lbl">
-          Bracket del cliente % GSV
-          <span class="tag tag-mkt">Negociado</span>
+        <span class="lbl">Bracket del cliente % GSV <span class="tag tag-mkt">Negociado</span>
           <span class="tw"><span class="tic">?</span>
-          <div class="tb">Descuento financiero estructural por cuenta, aplicado sobre GSV neto (sin IEPS). Ej: Walmart 11.5%, Sam's 10%, Oxxo 5–8%.</div></span>
+          <div class="tb">Descuento financiero estructural por cuenta, aplicado sobre GSV neto. Ej: Walmart 11.5%, Sam's 10%, Oxxo 5–8%.</div></span>
         </span>
         <div class="ig" style="border-left:2.5px solid #a855f7">
           <span class="sym" style="color:#7e22ce">%</span>
-          <input type="number" id="bracket" value="11.5" min="0" max="50" step="0.5" oninput="recalc()">
-        </div>
+          <input type="number" id="bracket" value="11.5" min="0" max="50" step="0.5" oninput="recalc()"></div>
         <span class="nt">Descuento fijo por cuenta. Ref: Walmart 11.5%</span>
       </div>
-
       <div class="f">
-        <span class="lbl">
-          Trade spend % GSV
-          <span class="tag tag-mkt">Negociado</span>
-        </span>
-        <div class="ig">
-          <span class="sym">%</span>
-          <input type="number" id="trade" value="7" min="0" max="50" step="0.5" oninput="recalc()">
-        </div>
+        <span class="lbl">Trade spend % GSV <span class="tag tag-mkt">Negociado</span></span>
+        <div class="ig"><span class="sym">%</span>
+          <input type="number" id="trade" value="7" min="0" max="50" step="0.5" oninput="recalc()"></div>
         <span class="nt">Inversión variable en cuenta. Ref: Turin 7.0%</span>
       </div>
-
       <div class="f">
         <span class="lbl">MAC objetivo mínimo % NSV</span>
-        <div class="ig">
-          <span class="sym">%</span>
-          <input type="number" id="mact" value="22.3" min="0" max="80" step="0.1" oninput="recalc()">
-        </div>
+        <div class="ig"><span class="sym">%</span>
+          <input type="number" id="mact" value="22.3" min="0" max="80" step="0.1" oninput="recalc()"></div>
         <span class="nt">Ref. Turin Mini Bottle: 22.3%</span>
       </div>
-
     </div>
   </div>
 
@@ -382,20 +212,41 @@
     <p class="slbl">Bundle: gadget & empaque adicional</p>
     <div class="fg">
       <div class="f">
-        <span class="lbl">Costo gadget $MXN</span>
+        <span class="lbl">Costo gadget $MXN / unidad</span>
         <div class="ig" style="border-left:2.5px solid #22c55e">
           <span class="sym" style="color:#15803d">$</span>
-          <input type="number" id="gadget" value="25" min="0" step="0.5" oninput="recalc()">
-        </div>
+          <input type="number" id="gadget" value="25" min="0" step="0.5" oninput="recalc()"></div>
         <span class="nt">Taza, termo, bolsa, set, etc.</span>
       </div>
       <div class="f">
-        <span class="lbl">Empaque adicional $MXN</span>
+        <span class="lbl">Empaque secundario $MXN / unidad <span class="tag tag-sec">2°</span>
+          <span class="tw"><span class="tic">?</span>
+          <div class="tb">Empaque que envuelve cada unidad del bundle: sleeve, caja regalo, bolsa individual. Costo directo por pieza.</div></span>
+        </span>
         <div class="ig" style="border-left:2.5px solid #22c55e">
           <span class="sym" style="color:#15803d">$</span>
-          <input type="number" id="pack" value="0" min="0" step="0.5" oninput="recalc()">
-        </div>
-        <span class="nt">Caja, sleeve, display exterior</span>
+          <input type="number" id="secpack" value="0" min="0" step="0.5" oninput="recalc()"></div>
+        <span class="nt">Sleeve, caja regalo, bolsa exterior</span>
+      </div>
+    </div>
+    <div class="div"></div>
+    <div class="fg">
+      <div class="f">
+        <span class="lbl">Costo corrugado $MXN / pieza <span class="tag tag-ter">3°</span>
+          <span class="tw"><span class="tic">?</span>
+          <div class="tb">Costo total de una pieza de corrugado (caja máster / empaque terciario). Se divide automáticamente entre las unidades que contiene.</div></span>
+        </span>
+        <div class="ig" style="border-left:2.5px solid #22d3ee">
+          <span class="sym" style="color:#0e7490">$</span>
+          <input type="number" id="corrcost" value="18" min="0" step="0.5" oninput="recalc()"></div>
+        <span class="nt">Corrugado, caja máster, display pallet</span>
+      </div>
+      <div class="f">
+        <span class="lbl">Unidades x corrugado <span class="tag tag-ter">3°</span></span>
+        <div class="ig" style="border-left:2.5px solid #22d3ee">
+          <span class="sym" style="color:#0e7490">#</span>
+          <input type="number" id="corrunits" value="12" min="1" step="1" oninput="recalc()"></div>
+        <span class="nt-calc" id="corr_calc">Costo/unidad: calculando...</span>
       </div>
     </div>
   </div>
@@ -411,50 +262,49 @@
   <!-- STATUS -->
   <div id="sb" class="sb s-ok"> </div>
 
+  <!-- TABS -->
+  <div class="tabs">
+    <button id="tab-unit" class="tab-btn active" onclick="setView('unit')">Por unidad</button>
+    <button id="tab-case" class="tab-btn" onclick="setView('case')">Por corrugado <span id="tab-case-label">(12 uds)</span></button>
+  </div>
+
   <!-- P&L TABLE -->
   <div class="pt-wrap">
     <table class="pt">
       <thead>
         <tr>
           <th style="text-align:left">Concepto</th>
-          <th>$ MXN</th>
-          <th>%</th>
+          <th id="th-mxn">$ MXN / unidad</th>
+          <th>% NSV</th>
         </tr>
       </thead>
       <tbody id="plb"></tbody>
     </table>
   </div>
-  <p class="fn">% = %GSV para markup, IEPS, bracket y trade &nbsp;·&nbsp; %NSV para COGS y MAC</p>
+  <p class="fn" id="pl-fn">% = %GSV para markup, IEPS, bracket y trade &nbsp;·&nbsp; %NSV para COGS y MAC</p>
 
-</div><!-- /container -->
+</div>
 
 <script>
-/* ── COGS config ─────────────────────────────────────────── */
+/* ── COGS config ── */
 const COGS = [
-  { id:'raws', lbl:'Raws & Packs',      val:35, mode:'$',
-    note:'Mat. prima + empaque del producto base', tip:null },
-  { id:'mcc',  lbl:'MCC / Manufactura', val:15, mode:'$',
-    note:'Conversión en planta (MCC + MCC INV)', tip:null },
-  { id:'lcc',  lbl:'LCC / Logística',   val:5,  mode:'%',
-    note:'Si no lo tienes, 4–6% NSV ref. CPG México',
-    tip:'Logistics & Customer Costs: flete planta → DC del retailer, almacenaje y maniobras. Mars lo mide por tonelada. Usa %NSV si no tienes el dato exacto.' },
-  { id:'oh',   lbl:'Overhead / fijos',  val:3,  mode:'%',
-    note:'Si no lo tienes, 2–4% NSV como benchmark',
-    tip:'Costos fijos asignados al SKU: depreciación, SG&A prorrateado por línea de negocio. Finanzas lo puede dar como % estándar.' }
+  { id:'raws', lbl:'Raws & Packs',      val:35, mode:'$', note:'Mat. prima + empaque del producto base', tip:null },
+  { id:'mcc',  lbl:'MCC / Manufactura', val:15, mode:'$', note:'Conversión en planta (MCC + MCC INV)',   tip:null },
+  { id:'lcc',  lbl:'LCC / Logística',   val:5,  mode:'%', note:'Si no lo tienes, 4–6% NSV ref. CPG México',
+    tip:'Logistics & Customer Costs: flete planta → DC del retailer, almacenaje y maniobras. Usa %NSV si no tienes el dato exacto.' },
+  { id:'oh',   lbl:'Overhead / fijos',  val:3,  mode:'%', note:'Si no lo tienes, 2–4% NSV como benchmark',
+    tip:'Costos fijos asignados al SKU: depreciación, SG&A prorrateado. Finanzas lo da como % estándar.' }
 ];
 
-/* ── Inline style strings (bypasan estilos del host) ──────── */
 const SB_ABS = 'background:#dcfce7;color:#15803d;font-weight:600';
 const SB_PCT = 'background:#dbeafe;color:#1e40af;font-weight:600';
 const SB_OFF = 'background:transparent;color:#6b7280;font-weight:400';
-const IB_ABS = '2.5px solid #22c55e';
-const IB_PCT = '2.5px solid #3b82f6';
 
 function applyMode(id, mode) {
-  document.getElementById(id+'-ig').style.borderLeft = mode==='$' ? IB_ABS : IB_PCT;
+  document.getElementById(id+'-ig').style.borderLeft = mode==='$' ? '2.5px solid #22c55e' : '2.5px solid #3b82f6';
   const sym = document.getElementById(id+'-sym');
-  sym.style.color   = mode==='$' ? '#15803d' : '#1e40af';
-  sym.textContent   = mode==='$' ? '$' : '%';
+  sym.style.color  = mode==='$' ? '#15803d' : '#1e40af';
+  sym.textContent  = mode==='$' ? '$' : '%';
   document.getElementById(id+'-a').style.cssText = mode==='$' ? SB_ABS : SB_OFF;
   document.getElementById(id+'-p').style.cssText = mode==='%' ? SB_PCT : SB_OFF;
 }
@@ -463,8 +313,6 @@ function buildCogs() {
   const grid = document.getElementById('cgrid');
   COGS.forEach(cg => {
     const div = document.createElement('div'); div.className = 'f';
-
-    /* label + pill */
     const lbl = document.createElement('span'); lbl.className = 'lbl';
     lbl.appendChild(document.createTextNode(cg.lbl + ' '));
     const pill = document.createElement('span'); pill.className = 'pill';
@@ -484,10 +332,8 @@ function buildCogs() {
       lbl.appendChild(tw);
     }
     div.appendChild(lbl);
-
-    /* input group */
     const ig = document.createElement('div'); ig.className = 'ig'; ig.id = cg.id+'-ig';
-    ig.style.borderLeft = cg.mode==='$' ? IB_ABS : IB_PCT;
+    ig.style.borderLeft = cg.mode==='$' ? '2.5px solid #22c55e' : '2.5px solid #3b82f6';
     const sym = document.createElement('span'); sym.className = 'sym'; sym.id = cg.id+'-sym';
     sym.textContent = cg.mode==='$' ? '$' : '%';
     sym.style.color = cg.mode==='$' ? '#15803d' : '#1e40af';
@@ -496,9 +342,7 @@ function buildCogs() {
     inp.oninput = recalc;
     ig.appendChild(sym); ig.appendChild(inp);
     div.appendChild(ig);
-
-    const note = document.createElement('span'); note.className = 'nt';
-    note.textContent = cg.note;
+    const note = document.createElement('span'); note.className = 'nt'; note.textContent = cg.note;
     div.appendChild(note);
     grid.appendChild(div);
   });
@@ -510,7 +354,14 @@ function setMode(id, mode) {
   recalc();
 }
 
-/* ── Helpers ─────────────────────────────────────────────── */
+let viewMode = 'unit';
+function setView(v) {
+  viewMode = v;
+  document.getElementById('tab-unit').className = 'tab-btn' + (v==='unit' ? ' active' : '');
+  document.getElementById('tab-case').className = 'tab-btn' + (v==='case' ? ' active' : '');
+  recalc();
+}
+
 const g  = id => parseFloat(document.getElementById(id).value) || 0;
 const f$ = n  => (n < 0 ? '-' : '') + '$' + Math.abs(n).toFixed(1);
 const fp = n  => n.toFixed(1) + '%';
@@ -528,40 +379,43 @@ function mkRow(lbl, abs, pctV, cls, sub) {
   return row;
 }
 
-/* ── Recalc ──────────────────────────────────────────────── */
 function recalc() {
   const rsp=g('rsp'), retP=g('ret'), iepsP=g('ieps'),
         bracketP=g('bracket'), tradeP=g('trade'), mactP=g('mact');
-  const gadget=g('gadget'), pack=g('pack');
+  const gadget=g('gadget'), secPack=g('secpack');
+  const corrCost=g('corrcost'), corrUnits=Math.max(1, g('corrunits'));
+  const corrPerUnit = corrCost / corrUnits;
+
+  /* Corrugado note */
+  document.getElementById('corr_calc').textContent =
+    'Costo/unidad: $' + corrPerUnit.toFixed(2) + ' = $' + corrCost.toFixed(1) + ' ÷ ' + corrUnits + ' uds';
+  document.getElementById('tab-case-label').textContent = '(' + corrUnits + ' uds)';
 
   /* Cascada */
-  const mkup      = retP / 100;
-  const gsv       = rsp / (1 + mkup);         // GSV facturado (total en factura)
-  const retA      = rsp - gsv;
-  const iepsA     = gsv * iepsP / 100;         // IEPS → va a SAT
-  const gsvNeto   = gsv - iepsA;              // GSV neto → ingreso Mars del producto
-  const bracketA  = gsvNeto * bracketP / 100;  // descuentos sobre GSV neto
-  const tradeA    = gsvNeto * tradeP   / 100;
-  const nsv       = gsvNeto - bracketA - tradeA;
-  const pct       = a => nsv > 0 ? a / nsv * 100 : 0;
+  const mkup     = retP / 100;
+  const gsv      = rsp / (1 + mkup);
+  const retA     = rsp - gsv;
+  const iepsA    = gsv * iepsP / 100;
+  const gsvNeto  = gsv - iepsA;
+  const bracketA = gsvNeto * bracketP / 100;
+  const tradeA   = gsvNeto * tradeP   / 100;
+  const nsv      = gsvNeto - bracketA - tradeA;
+  const pct      = a => nsv > 0 ? a / nsv * 100 : 0;
 
   const cogsVals = {};
-  COGS.forEach(cg => {
-    const v = g(cg.id);
-    cogsVals[cg.id] = cg.mode==='$' ? v : nsv * v / 100;
-  });
+  COGS.forEach(cg => { const v=g(cg.id); cogsVals[cg.id] = cg.mode==='$' ? v : nsv*v/100; });
   const cogsTotal = Object.values(cogsVals).reduce((a,b) => a+b, 0);
 
-  const mac       = nsv - cogsTotal - gadget - pack;
+  const mac       = nsv - cogsTotal - gadget - secPack - corrPerUnit;
   const macPct    = pct(mac);
   const macOK     = macPct >= mactP;
   const mactA     = nsv * mactP / 100;
   const budget    = nsv - cogsTotal - mactA;
-  const remaining = budget - gadget - pack;
-  const gadgetMax = Math.max(0, budget - pack);
+  const remaining = budget - gadget - secPack - corrPerUnit;
+  const gadgetMax = Math.max(0, budget - secPack - corrPerUnit);
 
-  /* Bottom-up: NSV mín → GSV neto mín → GSV fact mín → RSP mín */
-  let FC = gadget + pack, PCfrac = 0;
+  /* Bottom-up */
+  let FC = gadget + secPack + corrPerUnit, PCfrac = 0;
   COGS.forEach(cg => { if(cg.mode==='$') FC += g(cg.id); else PCfrac += g(cg.id)/100; });
   const denom        = 1 - PCfrac - mactP/100;
   const gsvNetoDenom = 1 - bracketP/100 - tradeP/100;
@@ -574,16 +428,14 @@ function recalc() {
   }
 
   /* KPIs */
-  document.getElementById('k_gsv').textContent  = f$(gsv);
-  document.getElementById('k_nsv').textContent  = f$(nsv);
+  document.getElementById('k_gsv').textContent = f$(gsv);
+  document.getElementById('k_nsv').textContent = f$(nsv);
   const kMac = document.getElementById('k_mac');
-  kMac.textContent  = fp(macPct);
-  kMac.style.color  = macOK ? '#15803d' : '#b91c1c';
+  kMac.textContent = fp(macPct);
+  kMac.style.color = macOK ? '#15803d' : '#b91c1c';
   const kRmin = document.getElementById('k_rspmin');
-  if (rspMin !== null) {
-    kRmin.textContent = f$(rspMin);
-    kRmin.style.color = rsp >= rspMin ? '#15803d' : '#b91c1c';
-  } else { kRmin.textContent = 'N/A'; kRmin.style.color = '#9ca3af'; }
+  if (rspMin !== null) { kRmin.textContent = f$(rspMin); kRmin.style.color = rsp>=rspMin ? '#15803d' : '#b91c1c'; }
+  else { kRmin.textContent = 'N/A'; kRmin.style.color = '#9ca3af'; }
 
   /* Status */
   const sb = document.getElementById('sb');
@@ -594,7 +446,7 @@ function recalc() {
       '. Margen restante: ' + f$(remaining) + ' (' + fp(pct(remaining)) + '). ' + ri;
   } else if (macOK && remaining < 0) {
     sb.className = 'sb s-warn';
-    sb.textContent = 'MAC OK (' + fp(macPct) + ') pero gadget+empaque supera presupuesto en ' +
+    sb.textContent = 'MAC OK (' + fp(macPct) + ') pero bundle costs superan presupuesto en ' +
       f$(Math.abs(remaining)) + '. Gadget máx posible: ' + f$(gadgetMax) + '.';
   } else {
     sb.className = 'sb s-bad';
@@ -602,40 +454,69 @@ function recalc() {
       ' bajo objetivo. ' + ri + ' Reduce costos o ajusta RSP.';
   }
 
-  /* P&L table */
+  /* Table */
+  const isCase = viewMode === 'case';
+  const M = isCase ? corrUnits : 1;
+  document.getElementById('th-mxn').textContent = isCase
+    ? '$ MXN / corrugado (' + corrUnits + ' uds)' : '$ MXN / unidad';
+  document.getElementById('pl-fn').textContent = isCase
+    ? 'Vista por corrugado (' + corrUnits + ' unidades) · % NSV = referencia por unidad'
+    : '% = %GSV para markup, IEPS, bracket y trade · %NSV para COGS y MAC';
+
   const b = document.getElementById('plb');
   b.innerHTML = '';
 
-  b.appendChild(mkRow('RSP (precio a consumidor)',                        rsp,      null,      '',      false));
-  b.appendChild(mkRow('(-) Markup cliente ('+retP+'% sobre GSV)',         retA,     retP,      'ded',   true));
-  b.appendChild(mkRow('= GSV facturado al cliente',                       gsv,      null,      'tot',   false));
-  b.appendChild(mkRow('(-) IEPS ('+iepsP+'% sobre GSV — remitido a SAT)',iepsA,    iepsP,     'ded',   true));
-  b.appendChild(mkRow('= GSV neto (ingreso Mars del producto)',           gsvNeto,  null,      'tot2',  false));
-  b.appendChild(mkRow('(-) Bracket cliente ('+bracketP+'% sobre GSV neto)', bracketA, bracketP,'ded',  true));
-  b.appendChild(mkRow('(-) Trade spend ('+tradeP+'% sobre GSV neto)',    tradeA,   tradeP,    'ded',   true));
-  b.appendChild(mkRow('= NSV [base 100%]',                               nsv,      100,       'tot',   false));
-
-  COGS.forEach(cg => {
-    const a   = cogsVals[cg.id];
-    const sfx = cg.mode==='%' ? ' ('+g(cg.id)+'% NSV)' : '';
-    b.appendChild(mkRow('(-) ' + cg.lbl + sfx,                          a,        pct(a),    'ded',   true));
-  });
-
-  b.appendChild(mkRow('(-) Gadget',                                      gadget,   pct(gadget),'ded',  true));
-  b.appendChild(mkRow('(-) Empaque adicional',                           pack,     pct(pack), 'ded',   true));
-  b.appendChild(mkRow('= MAC real',                                      mac,      macPct,    macOK ? 'mac-ok' : 'mac-bad', false));
-  b.appendChild(mkRow('MAC objetivo mínimo',                             mactA,    mactP,     'ref',   false));
-  b.appendChild(mkRow('Presupuesto total (gadget + empaque)',            Math.max(0,budget), pct(Math.max(0,budget)), 'tot', false));
-  b.appendChild(mkRow('Margen de maniobra restante',                     remaining,pct(remaining), remaining>=0?'rem-ok':'rem-warn', false));
-
-  if (rspMin !== null) {
-    const sr = document.createElement('tr'); sr.className = 'sr';
-    const sc = document.createElement('td'); sc.colSpan = 3;
-    sc.textContent = 'Bottom-up — ingeniería inversa desde costos';
-    sr.appendChild(sc); b.appendChild(sr);
-    b.appendChild(mkRow('RSP mínimo requerido',                          rspMin,   null,      'bu',    false));
-    const delta = rsp - rspMin;
-    b.appendChild(mkRow('Delta RSP actual vs mínimo',                    delta,    null,      delta>=0?'rem-ok':'rem-warn', false));
+  if (isCase) {
+    b.appendChild(mkRow('RSP (precio consumidor × ' + corrUnits + ')',             rsp*M,         null,           '',       false));
+    b.appendChild(mkRow('(-) Markup cliente (' + retP + '%)',                      retA*M,        retP,           'ded',    true));
+    b.appendChild(mkRow('= GSV facturado al cliente',                              gsv*M,         null,           'tot',    false));
+    b.appendChild(mkRow('(-) IEPS (' + iepsP + '% — remitido a SAT)',             iepsA*M,       iepsP,          'ded',    true));
+    b.appendChild(mkRow('= GSV neto (ingreso Mars del producto)',                  gsvNeto*M,     null,           'tot2',   false));
+    b.appendChild(mkRow('(-) Bracket cliente (' + bracketP + '%)',                 bracketA*M,    bracketP,       'ded',    true));
+    b.appendChild(mkRow('(-) Trade spend (' + tradeP + '%)',                       tradeA*M,      tradeP,         'ded',    true));
+    b.appendChild(mkRow('= NSV total corrugado',                                   nsv*M,         null,           'tot',    false));
+    COGS.forEach(cg => {
+      const a = cogsVals[cg.id];
+      const sfx = cg.mode==='%' ? ' (' + g(cg.id) + '% NSV)' : '';
+      b.appendChild(mkRow('(-) ' + cg.lbl + sfx,                                  a*M,           pct(a),         'ded',    true));
+    });
+    b.appendChild(mkRow('(-) Gadget (×' + corrUnits + ')',                         gadget*M,      pct(gadget),    'ded',    true));
+    b.appendChild(mkRow('(-) Empaque secundario (×' + corrUnits + ')',             secPack*M,     pct(secPack),   'ded',    true));
+    b.appendChild(mkRow('(-) Corrugado / terciario (costo total)',                 corrCost,      pct(corrPerUnit),'ded',   true));
+    b.appendChild(mkRow('= MAC total corrugado',                                   mac*M,         macPct,         macOK ? 'mac-ok' : 'mac-bad', false));
+    b.appendChild(mkRow('MAC objetivo mínimo',                                     mactA*M,       mactP,          'ref',    false));
+    b.appendChild(mkRow('Presupuesto total bundle (gadget+sec+corrugado)',         Math.max(0,budget)*M, pct(Math.max(0,budget)), 'tot', false));
+    b.appendChild(mkRow('Margen de maniobra restante',                             remaining*M,   pct(remaining), remaining>=0 ? 'rem-ok' : 'rem-warn', false));
+  } else {
+    b.appendChild(mkRow('RSP (precio a consumidor)',                               rsp,           null,           '',       false));
+    b.appendChild(mkRow('(-) Markup cliente (' + retP + '% sobre GSV)',            retA,          retP,           'ded',    true));
+    b.appendChild(mkRow('= GSV facturado al cliente',                              gsv,           null,           'tot',    false));
+    b.appendChild(mkRow('(-) IEPS (' + iepsP + '% sobre GSV — remitido a SAT)',   iepsA,         iepsP,          'ded',    true));
+    b.appendChild(mkRow('= GSV neto (ingreso Mars del producto)',                  gsvNeto,       null,           'tot2',   false));
+    b.appendChild(mkRow('(-) Bracket cliente (' + bracketP + '% sobre GSV neto)', bracketA,      bracketP,       'ded',    true));
+    b.appendChild(mkRow('(-) Trade spend (' + tradeP + '% sobre GSV neto)',       tradeA,        tradeP,         'ded',    true));
+    b.appendChild(mkRow('= NSV [base 100%]',                                      nsv,           100,            'tot',    false));
+    COGS.forEach(cg => {
+      const a = cogsVals[cg.id];
+      const sfx = cg.mode==='%' ? ' (' + g(cg.id) + '% NSV)' : '';
+      b.appendChild(mkRow('(-) ' + cg.lbl + sfx,                                  a,             pct(a),         'ded',    true));
+    });
+    b.appendChild(mkRow('(-) Gadget',                                              gadget,        pct(gadget),    'ded',    true));
+    b.appendChild(mkRow('(-) Empaque secundario',                                  secPack,       pct(secPack),   'ded',    true));
+    b.appendChild(mkRow('(-) Corrugado (' + f$(corrCost) + ' ÷ ' + corrUnits + ' uds)', corrPerUnit, pct(corrPerUnit), 'ded', true));
+    b.appendChild(mkRow('= MAC real',                                              mac,           macPct,         macOK ? 'mac-ok' : 'mac-bad', false));
+    b.appendChild(mkRow('MAC objetivo mínimo',                                     mactA,         mactP,          'ref',    false));
+    b.appendChild(mkRow('Presupuesto total (gadget + sec + corrugado/ud)',         Math.max(0,budget), pct(Math.max(0,budget)), 'tot', false));
+    b.appendChild(mkRow('Margen de maniobra restante',                             remaining,     pct(remaining), remaining>=0 ? 'rem-ok' : 'rem-warn', false));
+    if (rspMin !== null) {
+      const sr = document.createElement('tr'); sr.className = 'sr';
+      const sc = document.createElement('td'); sc.colSpan = 3;
+      sc.textContent = 'Bottom-up — ingeniería inversa desde costos';
+      sr.appendChild(sc); b.appendChild(sr);
+      b.appendChild(mkRow('RSP mínimo requerido',                                  rspMin,        null,           'bu',     false));
+      const delta = rsp - rspMin;
+      b.appendChild(mkRow('Delta RSP actual vs mínimo',                            delta,         null,           delta>=0 ? 'rem-ok' : 'rem-warn', false));
+    }
   }
 }
 
