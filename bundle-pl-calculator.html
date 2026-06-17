@@ -131,6 +131,23 @@
 
     /* ── FOOTNOTE ── */
     .fn { font-size: 10.5px; color: var(--text-ter); margin-top: 8px; text-align: right; }
+
+    /* ── HEADROOM CARD ── */
+    .hw { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 10px; }
+    .hw-title { font-size: 10px; font-weight: 600; color: var(--text-ter); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 12px; }
+    .hw-row { display: flex; align-items: baseline; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6; gap: 12px; }
+    .hw-row:last-child { border-bottom: none; }
+    .hw-label { font-size: 12px; color: var(--text-sec); flex: 1; }
+    .hw-val { font-family: var(--mono); font-size: 14px; font-weight: 600; white-space: nowrap; }
+    .hw-sub  { font-size: 10.5px; color: var(--text-ter); font-family: var(--mono); white-space: nowrap; }
+    .hw-ok   { color: var(--green); }
+    .hw-warn { color: var(--amber); }
+    .hw-bad  { color: var(--red); }
+    .hw-neutral { color: var(--text); }
+    .hw-tag { font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; border-radius: 3px; padding: 1px 5px; margin-left: 6px; vertical-align: middle; }
+    .hw-tag-empty { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-bd); }
+    .hw-tag-set   { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-bd); }
+    .hw-empty { display: none; }
   </style>
 </head>
 <body>
@@ -257,6 +274,12 @@
     <div class="kc"><div class="kl">NSV / unidad</div><div class="kv" id="k_nsv">—</div></div>
     <div class="kc"><div class="kl">MAC real % NSV</div><div class="kv" id="k_mac">—</div></div>
     <div class="kc"><div class="kl">RSP mínimo requerido</div><div class="kv" id="k_rspmin">—</div></div>
+  </div>
+
+  <!-- HEADROOM -->
+  <div class="hw" id="hw-block">
+    <p class="hw-title">Espacio de maniobra — dado MAC objetivo</p>
+    <div id="hw-rows"></div>
   </div>
 
   <!-- STATUS -->
@@ -436,6 +459,136 @@ function recalc() {
   const kRmin = document.getElementById('k_rspmin');
   if (rspMin !== null) { kRmin.textContent = f$(rspMin); kRmin.style.color = rsp>=rspMin ? '#15803d' : '#b91c1c'; }
   else { kRmin.textContent = 'N/A'; kRmin.style.color = '#9ca3af'; }
+
+  /* ── HEADROOM ── */
+  (function buildHeadroom() {
+    const hwRows = document.getElementById('hw-rows');
+    hwRows.innerHTML = '';
+
+    // Presupuesto total disponible para bundle costs = NSV × (1 - mactP/100) - COGS fijos
+    // budget = nsv - cogsTotal - mactA  (ya calculado arriba)
+    // remaining = budget - gadget - secPack - corrPerUnit  (ya calculado)
+
+    const gadgetVal    = g('gadget');
+    const secPackVal   = g('secpack');
+    const corrCostVal  = g('corrcost');
+
+    const gadgetEmpty  = gadgetVal   === 0;
+    const secPackEmpty = secPackVal  === 0;
+    const corrEmpty    = corrCostVal === 0;
+
+    // Headroom si UN campo está vacío = lo que queda después de los otros dos
+    const headGadget  = budget - secPack    - corrPerUnit;
+    const headSecPack = budget - gadget     - corrPerUnit;
+    const headCorr    = (budget - gadget    - secPack) * corrUnits; // en $ corrugado total
+
+    function mkHwRow(label, isSet, val, sub, valClass) {
+      const d = document.createElement('div');
+      d.className = 'hw-row';
+      const lSpan = document.createElement('span');
+      lSpan.className = 'hw-label';
+      lSpan.innerHTML = label +
+        '<span class="hw-tag ' + (isSet ? 'hw-tag-set' : 'hw-tag-empty') + '">' +
+        (isSet ? 'capturado' : 'pendiente') + '</span>';
+      const rDiv = document.createElement('div');
+      rDiv.style.textAlign = 'right';
+      const vSpan = document.createElement('div');
+      vSpan.className = 'hw-val ' + valClass;
+      vSpan.textContent = val;
+      const sSpan = document.createElement('div');
+      sSpan.className = 'hw-sub';
+      sSpan.textContent = sub;
+      rDiv.appendChild(vSpan);
+      rDiv.appendChild(sSpan);
+      d.appendChild(lSpan);
+      d.appendChild(rDiv);
+      hwRows.appendChild(d);
+    }
+
+    function cls(v) { return v > 0 ? 'hw-ok' : v === 0 ? 'hw-neutral' : 'hw-bad'; }
+
+    // Fila 1: Presupuesto total bundle (siempre visible)
+    mkHwRow(
+      'Presupuesto total disponible (dado MAC ' + fp(mactP) + ')',
+      true,
+      f$(Math.max(0, budget)),
+      fp(Math.max(0, budget) / nsv * 100) + ' NSV',
+      cls(budget)
+    );
+
+    // Fila 2: Gadget
+    if (gadgetEmpty) {
+      mkHwRow(
+        'Gadget — ¿cuánto puedo gastar?',
+        false,
+        headGadget > 0 ? 'hasta ' + f$(headGadget) : 'Sin margen',
+        headGadget > 0
+          ? 'con sec $' + secPackVal.toFixed(1) + ' + corr $' + corrPerUnit.toFixed(1) + '/ud ya asignados'
+          : 'otros costos bundle ya consumen el presupuesto',
+        cls(headGadget)
+      );
+    } else {
+      mkHwRow(
+        'Gadget',
+        true,
+        f$(gadgetVal),
+        fp(pct(gadgetVal)) + ' NSV',
+        'hw-neutral'
+      );
+    }
+
+    // Fila 3: Empaque secundario
+    if (secPackEmpty) {
+      mkHwRow(
+        'Empaque secundario — ¿cuánto puedo gastar?',
+        false,
+        headSecPack > 0 ? 'hasta ' + f$(headSecPack) : 'Sin margen',
+        headSecPack > 0
+          ? 'con gadget $' + gadgetVal.toFixed(1) + ' + corr $' + corrPerUnit.toFixed(1) + '/ud ya asignados'
+          : 'otros costos bundle ya consumen el presupuesto',
+        cls(headSecPack)
+      );
+    } else {
+      mkHwRow(
+        'Empaque secundario',
+        true,
+        f$(secPackVal),
+        fp(pct(secPackVal)) + ' NSV',
+        'hw-neutral'
+      );
+    }
+
+    // Fila 4: Corrugado
+    if (corrEmpty) {
+      const corrMaxTotal = Math.max(0, budget - gadget - secPack) * corrUnits;
+      mkHwRow(
+        'Corrugado — ¿cuánto puede costar la pieza?',
+        false,
+        corrMaxTotal > 0 ? 'hasta ' + f$(corrMaxTotal) + ' / pieza' : 'Sin margen',
+        corrMaxTotal > 0
+          ? 'para ' + corrUnits + ' uds, con gadget $' + gadgetVal.toFixed(1) + ' + sec $' + secPackVal.toFixed(1) + ' ya asignados'
+          : 'otros costos bundle ya consumen el presupuesto',
+        cls(corrMaxTotal)
+      );
+    } else {
+      mkHwRow(
+        'Corrugado (' + corrUnits + ' uds)',
+        true,
+        f$(corrCostVal) + ' / pieza  →  ' + f$(corrPerUnit) + ' / ud',
+        fp(pct(corrPerUnit)) + ' NSV por unidad',
+        'hw-neutral'
+      );
+    }
+
+    // Fila 5: Margen restante (siempre)
+    mkHwRow(
+      'Margen de maniobra restante',
+      remaining >= 0,
+      f$(remaining),
+      fp(pct(remaining)) + ' NSV' + (remaining < 0 ? ' — bundle excede presupuesto' : ' disponible'),
+      cls(remaining)
+    );
+  })();
 
   /* Status */
   const sb = document.getElementById('sb');
