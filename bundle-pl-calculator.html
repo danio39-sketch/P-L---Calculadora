@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bundle Pack P&L — Calculadora | Mars Wrigley MX</title>
+  <title>Bundle Pack P&L — Calculadora
   <meta name="description" content="Calculadora de P&L inverso para bundle packs estacionales. RSP → GSV → NSV → MAC. Vista por unidad y por corrugado.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -154,7 +154,7 @@
 
 <header class="header">
   <div class="header-left">
-    <span class="logo">Mars Wrigley MX</span>
+    <span class="logo">Compañía MX</span>
     <h1>Bundle Pack — Calculadora P&L</h1>
   </div>
   <div class="header-right">
@@ -186,7 +186,7 @@
       <div class="f">
         <span class="lbl">IEPS % sobre GSV <span class="tag tag-fiscal">Fiscal</span>
           <span class="tw"><span class="tic">?</span>
-          <div class="tb">Mars cobra el IEPS al cliente y lo remite a SAT. No es ingreso de la empresa. Aplica a chocolates ≥275 kcal/100g. Tasa vigente: 8%.</div></span>
+          <div class="tb">La compañía cobra el IEPS al cliente y lo remite a SAT. No es ingreso de la empresa. Aplica a chocolates ≥275 kcal/100g. Tasa vigente: 8%.</div></span>
         </span>
         <div class="ig" style="border-left:2.5px solid #f59e0b">
           <span class="sym" style="color:#92400e">%</span>
@@ -624,7 +624,7 @@ function recalc() {
     b.appendChild(mkRow('(-) Markup cliente (' + retP + '%)',                      retA*M,        retP,           'ded',    true));
     b.appendChild(mkRow('= GSV facturado al cliente',                              gsv*M,         null,           'tot',    false));
     b.appendChild(mkRow('(-) IEPS (' + iepsP + '% — remitido a SAT)',             iepsA*M,       iepsP,          'ded',    true));
-    b.appendChild(mkRow('= GSV neto (ingreso Mars del producto)',                  gsvNeto*M,     null,           'tot2',   false));
+    b.appendChild(mkRow('= GSV neto (ingreso de la compañía)',                  gsvNeto*M,     null,           'tot2',   false));
     b.appendChild(mkRow('(-) Bracket cliente (' + bracketP + '%)',                 bracketA*M,    bracketP,       'ded',    true));
     b.appendChild(mkRow('(-) Trade spend (' + tradeP + '%)',                       tradeA*M,      tradeP,         'ded',    true));
     b.appendChild(mkRow('= NSV total corrugado',                                   nsv*M,         null,           'tot',    false));
@@ -645,7 +645,7 @@ function recalc() {
     b.appendChild(mkRow('(-) Markup cliente (' + retP + '% sobre GSV)',            retA,          retP,           'ded',    true));
     b.appendChild(mkRow('= GSV facturado al cliente',                              gsv,           null,           'tot',    false));
     b.appendChild(mkRow('(-) IEPS (' + iepsP + '% sobre GSV — remitido a SAT)',   iepsA,         iepsP,          'ded',    true));
-    b.appendChild(mkRow('= GSV neto (ingreso Mars del producto)',                  gsvNeto,       null,           'tot2',   false));
+    b.appendChild(mkRow('= GSV neto (ingreso de la compañía)',                  gsvNeto,       null,           'tot2',   false));
     b.appendChild(mkRow('(-) Bracket cliente (' + bracketP + '% sobre GSV neto)', bracketA,      bracketP,       'ded',    true));
     b.appendChild(mkRow('(-) Trade spend (' + tradeP + '% sobre GSV neto)',       tradeA,        tradeP,         'ded',    true));
     b.appendChild(mkRow('= NSV [base 100%]',                                      nsv,           100,            'tot',    false));
